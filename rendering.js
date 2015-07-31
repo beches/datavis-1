@@ -33,11 +33,11 @@ var area = d3.svg.area()
     .y1(function(d) { return y(d.temperature_global); });
 
 
-function myChart(columnName) {
+function myChart(columnName,tag) {
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
   
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select(tag)
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -109,8 +109,8 @@ d3.csv("data.csv", function(error, data) {
 
 }
 
-myChart("64°N Latitude to North Pole");
-myChart("Equator to 24°N Latitude");
-myChart("24°S Latitude to Equator");
-myChart("South Pole to 64°S Latitude");
+myChart("64°N Latitude to North Pole", ".c1");
+myChart("Equator to 24°N Latitude", ".c2");
+myChart("24°S Latitude to Equator", ".c3");
+myChart("South Pole to 64°S Latitude", ".c4");
 
