@@ -15,3 +15,7 @@ body {
   stroke-width: 1.5px;
 }
 
+.area {
+  fill: lightgrey;
+}
+

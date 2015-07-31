@@ -25,6 +25,12 @@ var line = d3.svg.line()
     .interpolate("basis")
     .x(function(d) { return x(d.year); })
     .y(function(d) { return y(d.temperature); });
+    
+var area = d3.svg.area()
+	.interpolate("basis")
+	.x(function(d) { return x(d.year); })
+    .y0(function(d) { return y(d.temperature); })
+    .y1(function(d) { return y(d.temperature_global); });
 
 var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
@@ -35,16 +41,17 @@ var svg = d3.select("body").append("svg")
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
 
-  color.domain(d3.keys(data[0]).filter(function(key) { return (key == "EQU-24N") || (key == "24S-EQU") || (key == "Global");  }));
+  color.domain(d3.keys(data[0]).filter(function(key) { return (key == "EQU-24N") || (key == "Global");  }));
   
   var regions = color.domain().map(function(name) {
     return {
       name: name,
       values: data.map(function(d) {
-        return {year: d.Year, temperature: +d[name]};
+        return {year: d.Year, temperature: +d[name], temperature_global: +d["Global"]};
       })
     };
   });
+  
 
   x.domain(d3.extent(data, function(d) { return d.Year; }));
 
@@ -83,6 +90,11 @@ d3.csv("data.csv", function(error, data) {
       .attr("class", "line")
       .attr("d", function(d) { return line(d.values); })
       .style("stroke", function(d) { return color(d.name); });
+      
+  city.append("path")
+      .attr("class", "area")
+      .attr("d", function(d) { return area(d.values); });
+     // .style("stroke", function(d) { return color(d.name); });
       
   city.append("text")
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
