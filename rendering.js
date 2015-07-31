@@ -14,7 +14,8 @@ var color = d3.scale.category10();
 
 var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom");
+    .orient("bottom")
+    .tickFormat(d3.format("d"));
 
 var yAxis = d3.svg.axis()
     .scale(y)
@@ -34,7 +35,7 @@ var svg = d3.select("body").append("svg")
 d3.csv("data.csv", function(error, data) {
   if (error) throw error;
 
-  color.domain(d3.keys(data[0]).filter(function(key) { return (key !== "Year") && (key !== "NHem") && (key !== "SHem") && (key !== "24N-90N") && (key !== "24S-24N") && (key !== "90S-24S");  }));
+  color.domain(d3.keys(data[0]).filter(function(key) { return (key == "EQU-24N") || (key == "24S-EQU") || (key == "Global");  }));
   
   var regions = color.domain().map(function(name) {
     return {
@@ -55,7 +56,13 @@ d3.csv("data.csv", function(error, data) {
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+      .call(xAxis)
+    .append("text")
+      .attr("x", width)
+      .attr("y", -12)
+      .attr("dy", ".71em")
+      .style("text-anchor","end")
+      .text("Year");
 
   svg.append("g")
       .attr("class", "y axis")
@@ -65,7 +72,7 @@ d3.csv("data.csv", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Temperature Difference (0.01 Kelvin)");
+      .text("Temperature Deviation (0.01 Kelvin)");
 
   var city = svg.selectAll(".city")
       .data(regions)
@@ -82,5 +89,6 @@ d3.csv("data.csv", function(error, data) {
       .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temperature) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
+      .attr("fill", function(d) { return color(d.name); })
       .text(function(d) { return d.name; });
 });
