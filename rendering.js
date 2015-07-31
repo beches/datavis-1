@@ -76,7 +76,10 @@ d3.csv("data.csv", function(error, data) {
       
   city.append("text")
       .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temperature+25*Math.sign(d.value.temperature-d.value.temperature_global)) + ")"; })
+      .attr("transform", function(d) { if(d.name == "Global Average") {
+                                         return "translate(" + x(d.value.year) + "," + y(d.value.temperature+10) + ")";
+                                        }
+                                         return "translate(" + x(d.value.year) + "," + y(d.value.temperature-20) + ")"; })
       .attr("x", 3)
       .attr("dy", ".35em")
       .attr("fill", function(d) { return color(d.name); })
