@@ -1,6 +1,6 @@
-var margin = {top: 20, right: 80, bottom: 30, left: 50},
+var margin = {top: 10, right: 130, bottom: 20, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 150 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%Y%m%d").parse;
 
@@ -32,22 +32,24 @@ var area = d3.svg.area()
     .y0(function(d) { return y(d.temperature); })
     .y1(function(d) { return y(d.temperature_global); });
 
-var svg = d3.select("body").append("svg")
+
+function myChart(columnName) {
+d3.csv("data.csv", function(error, data) {
+  if (error) throw error;
+  
+  var svg = d3.select("body").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.csv("data.csv", function(error, data) {
-  if (error) throw error;
-
-  color.domain(d3.keys(data[0]).filter(function(key) { return (key == "EQU-24N") || (key == "Global");  }));
+  color.domain(d3.keys(data[0]).filter(function(key) { return (key == columnName) || (key == "Global Average");  }));
   
   var regions = color.domain().map(function(name) {
     return {
       name: name,
       values: data.map(function(d) {
-        return {year: d.Year, temperature: +d[name], temperature_global: +d["Global"]};
+        return {year: d.Year, temperature: +d[name], temperature_global: +d["Global Average"]};
       })
     };
   });
@@ -55,11 +57,31 @@ d3.csv("data.csv", function(error, data) {
 
   x.domain(d3.extent(data, function(d) { return d.Year; }));
 
-  y.domain([
-    d3.min(regions, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-    d3.max(regions, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
-  ]);
+  y.domain([-200, 200]);
 
+  var city = svg.selectAll(".city")
+      .data(regions)
+    .enter().append("g")
+      .attr("class", "city");
+
+  city.append("path")
+      .attr("class", "line")
+      .attr("d", function(d) { return line(d.values); })
+      .style("stroke", function(d) { return color(d.name); });
+      
+  city.append("path")
+      .attr("class", "area")
+      .attr("d", function(d) { return area(d.values); });
+     // .style("stroke", function(d) { return color(d.name); });
+      
+  city.append("text")
+      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+      .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temperature+25*Math.sign(d.value.temperature-d.value.temperature_global)) + ")"; })
+      .attr("x", 3)
+      .attr("dy", ".35em")
+      .attr("fill", function(d) { return color(d.name); })
+      .text(function(d) { return d.name; });
+      
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
@@ -79,28 +101,13 @@ d3.csv("data.csv", function(error, data) {
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
-      .text("Temperature Deviation (0.01 Kelvin)");
-
-  var city = svg.selectAll(".city")
-      .data(regions)
-    .enter().append("g")
-      .attr("class", "city");
-
-  city.append("path")
-      .attr("class", "line")
-      .attr("d", function(d) { return line(d.values); })
-      .style("stroke", function(d) { return color(d.name); });
-      
-  city.append("path")
-      .attr("class", "area")
-      .attr("d", function(d) { return area(d.values); });
-     // .style("stroke", function(d) { return color(d.name); });
-      
-  city.append("text")
-      .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-      .attr("transform", function(d) { return "translate(" + x(d.value.year) + "," + y(d.value.temperature) + ")"; })
-      .attr("x", 3)
-      .attr("dy", ".35em")
-      .attr("fill", function(d) { return color(d.name); })
-      .text(function(d) { return d.name; });
+      .text("∆T (0.01K)");
 });
+
+}
+
+myChart("64°N Latitude to North Pole");
+myChart("Equator to 24°N Latitude");
+myChart("24°S Latitude to Equator");
+myChart("South Pole to 64°S Latitude");
+

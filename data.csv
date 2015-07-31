@@ -1,4 +1,4 @@
-Year,Global,NHem,SHem,24N-90N,24S-24N,90S-24S,64N-90N,44N-64N,24N-44N,EQU-24N,24S-EQU,44S-24S,64S-44S,90S-64S
+Year,Global Average,NHem,SHem,24N-90N,24S-24N,90S-24S,64°N Latitude to North Pole,44N-64N,24N-44N,Equator to 24°N Latitude,24°S Latitude to Equator,44S-24S,64S-44S,South Pole to 64°S Latitude
 1880,-19,-33,-5,-38,-16,-5,-89,-54,-22,-26,-5,-2,-8,39
 1881,-10,-18,-2,-27,-2,-5,-54,-40,-14,-5,2,-6,-3,37
 1882,-9,-17,-1,-21,-10,4,-125,-20,-3,-12,-8,3,8,42
